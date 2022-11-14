@@ -1,0 +1,247 @@
+openapi: 3.0.3
+info:
+  title: Social Network API
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /users:
+    get:
+      summary: Return all users
+      description: Read all users
+      responses:
+        200:
+          description: All users are returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        default:
+          description: Unexpected error
+    post:
+      summary: Create a user
+      description: Create a user
+      requestBody:
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: User successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{username}:
+    get:
+      summary: Returns a user by username
+      description: Returns a user by username.
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+            minimum: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+    put:
+      summary: Update a user by username
+      description: Update a user by username
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+            minimum: 1
+      requestBody:
+        description: Updated user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+    delete:
+      summary: Deletes a user by username
+      description: Deletes a user by username
+      parameters:
+        - name: username
+          in: path
+          description: Username of User to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successfully deleted
+        '400':
+          description: Invalid pet value
+
+  /posts:
+    get:
+      summary: Return all posts
+      description: Return all posts
+      parameters:
+        - in: query
+          name: greaterThan
+          schema:
+            type: integer
+          description: Threshold where posts with a higher like count is returned
+      responses:
+        200:
+          description: All posts are returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    post:
+      summary: Create post
+      description: Create a post
+      requestBody:
+        description: Created post object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+      responses:
+        default:
+          description: User successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+
+
+  /posts/{postId}:
+    get:
+      summary: Return post by postId
+      description: Return post by postId
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+            minimum: 1
+      responses:
+        200:
+          description: Successfully retrieved post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    put:
+      summary: Update a post by postId
+      description: Update a post by postId
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+        - in: query
+          name: addLike
+          required: false
+          schema:
+            type: string
+            description: userId of user to be added to liked
+        - in: query
+          name: removeLike
+          required: false
+          schema:
+            type: string
+            description: userId of user to be removed from liked
+      requestBody:
+        description: Updated post object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: Successful operation
+    delete:
+      summary: Delete post
+      parameters:
+        - name: postId
+          in: path
+          description: The post that needs to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Invalid username supplied
+        404:
+          description: User not found
+
+
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+          example: theUser
+        realName:
+          type: string
+          example: John
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 12415
+        authorId:
+          type: string
+          example: username123
+        textContents:
+          type: string
+          example: this is a post
+        replyTo:
+          type: array
+          items:
+            type: string
+            example: postId1
+        liked:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            example: username123
